@@ -44,10 +44,7 @@ func (uu *userUsecase) Pay(userID int64, productID int64, quantity int64) error 
 		return errors.New("Quantity not enough")
 	}
 
-	// TODO: cover negative balance via unit test
-	newAmount := deposit.Balance - (product.Price * quantity)
-
-	err = uu.DepositUsecase.ReduceBalance(deposit.ID, newAmount)
+	err = uu.DepositUsecase.ReduceBalance(deposit.ID, product.Price * quantity)
 	return err
 }
 
