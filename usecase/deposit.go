@@ -29,7 +29,7 @@ func (du *depositUsecase) ReduceBalance(ID int64, amount int64) error {
 	// TODO: cover negative balance via unit test
 	deposit.Balance -= amount
 
-	err = du.DepositRepo.UpdateDeposit(ID, deposit)
+	err = du.DepositRepo.Update(ID, deposit)
 	return err
 }
 
@@ -41,6 +41,6 @@ func (du *depositUsecase) IncreaseBalance(ID int64, amount int64) error {
 
 	deposit.Balance += amount
 
-	err = du.DepositRepo.UpdateDeposit(ID, deposit)
+	err = du.DepositRepo.Update(ID, deposit)
 	return err
 }

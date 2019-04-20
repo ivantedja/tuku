@@ -19,10 +19,10 @@ func NewMysqlDepositRepo(db *sql.DB) tuku.DepositRepo {
 	return &mysqlDepositRepo{sqlxdb}
 }
 
-func (d *mysqlDepositRepo) Get(ID int64) (*tuku.Deposit, error) {
+func (dr *mysqlDepositRepo) Get(ID int64) (*tuku.Deposit, error) {
 	query := `SELECT id, user_id, balance, updated_at, created_at FROM deposits WHERE id = ?`
 	var deposit tuku.Deposit
-	err := d.db.Get(&deposit, query, ID)
+	err := dr.db.Get(&deposit, query, ID)
 	if err == sql.ErrNoRows {
 		return nil, errors.New("Deposit not found")
 	}
@@ -32,6 +32,33 @@ func (d *mysqlDepositRepo) Get(ID int64) (*tuku.Deposit, error) {
 	}
 
 	return &deposit, nil
+}
+
+
+func (dr *mysqlDepositRepo) Update(ID int64, d *tuku.Deposit) error {
+	query := `UPDATE deposits set balance=?, updated_at=? WHERE id = ?`
+
+	stmt, err := dr.db.Prepare(query)
+	if err != nil {
+		return nil
+	}
+
+	res, err := stmt.Exec(d.Balance, d.UpdatedAt, ID)
+	if err != nil {
+		return err
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if affected != 1 {
+		err = fmt.Errorf("Weird  Behaviour. Total Affected: %d", affected)
+		return err
+	}
+
+	return nil
 }
 
 func (d *mysqlDepositRepo) GetBalanceByUserID(userID int64) (*tuku.Deposit, error) {
@@ -47,30 +74,4 @@ func (d *mysqlDepositRepo) GetBalanceByUserID(userID int64) (*tuku.Deposit, erro
 	}
 
 	return &deposit, nil
-}
-
-func (d *mysqlDepositRepo) UpdateDeposit(ID int64, deposit *tuku.Deposit) error {
-	query := `UPDATE deposits set balance=?, updated_at=? WHERE id = ?`
-
-	stmt, err := d.db.Prepare(query)
-	if err != nil {
-		return nil
-	}
-
-	res, err := stmt.Exec(deposit.Balance, deposit.UpdatedAt, ID)
-	if err != nil {
-		return err
-	}
-
-	affect, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if affect != 1 {
-		err = fmt.Errorf("Weird  Behaviour. Total Affected: %d", affect)
-		return err
-	}
-
-	return nil
 }

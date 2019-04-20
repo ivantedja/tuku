@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/ivantedja/tuku"
 
@@ -50,6 +51,32 @@ func (pr *mysqlProductRepo) Create(p *tuku.Product) error {
 		return err
 	}
 	p.ID = lastID
+	return nil
+}
+
+func (pr *mysqlProductRepo) Update(ID int64, p *tuku.Product) error {
+	query := `UPDATE products set user_id=?, name=?, price=?, quantity=?, updated_at=? WHERE id = ?`
+
+	stmt, err := pr.db.Prepare(query)
+	if err != nil {
+		return nil
+	}
+
+	res, err := stmt.Exec(p.UserID, p.Name, p.Price, p.Quantity, p.UpdatedAt, ID)
+	if err != nil {
+		return err
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if affected != 1 {
+		err = fmt.Errorf("Weird  Behaviour. Total Affected: %d", affected)
+		return err
+	}
+
 	return nil
 }
 

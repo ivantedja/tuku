@@ -30,7 +30,7 @@ func (u *userUsecase) CreateUser(user *tuku.User) error {
 }
 
 func (uu *userUsecase) Pay(userID int64, productID int64, quantity int64) error {
-	deposit, err := uu.DepositUsecase.GetBalanceByUserID(userID)
+	buyerDeposit, err := uu.DepositUsecase.GetBalanceByUserID(userID)
 	if err != nil {
 		return err
 	}
@@ -40,11 +40,31 @@ func (uu *userUsecase) Pay(userID int64, productID int64, quantity int64) error 
 		return err
 	}
 
+	sellerDeposit, err := uu.DepositUsecase.GetBalanceByUserID(product.UserID)
+	if err != nil {
+		return err
+	}
+
 	if product.Quantity < quantity {
 		return errors.New("Quantity not enough")
 	}
 
-	err = uu.DepositUsecase.ReduceBalance(deposit.ID, product.Price * quantity)
+	amount := product.Price * quantity
+
+	// TODO: use database transaction
+	err = uu.DepositUsecase.ReduceBalance(buyerDeposit.ID, amount)
+	if err != nil {
+		return err
+	}
+
+	err = uu.DepositUsecase.IncreaseBalance(sellerDeposit.ID, amount)
+	if err != nil {
+		return err
+	}
+
+	product.Quantity -= quantity
+
+	err = uu.ProductRepo.Update(productID, product)
 	return err
 }
 
