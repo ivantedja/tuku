@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/ivantedja/tuku"
 )
