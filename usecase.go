@@ -12,4 +12,5 @@ type UserUsecase interface {
 
 type DepositUsecase interface {
 	GetBalanceByUserID(userID int64) (*Deposit, error)
+	ReduceBalance(userID int64, productId int64, quantity int64) error
 }

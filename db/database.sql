@@ -21,8 +21,9 @@ PRIMARY KEY (`id`)
 CREATE TABLE `deposits` (
 `id` bigint(20) NOT NULL AUTO_INCREMENT,
 `user_id` bigint(20) NOT NULL,
-`price` int(10) unsigned DEFAULT NULL,
+`balance` int(10) signed DEFAULT NULL,
 `created_at` datetime NOT NULL,
 `updated_at` datetime NOT NULL,
-PRIMARY KEY (`id`)
+PRIMARY KEY (`id`),
+UNIQUE KEY `unique_user_id` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;

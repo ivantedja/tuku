@@ -18,6 +18,21 @@ func NewMysqlProductRepo(db *sql.DB) tuku.ProductRepo {
 	return &mysqlProductRepo{sqlxdb}
 }
 
+func (pr *mysqlProductRepo) Get(id int64) (*tuku.Product, error) {
+	query := `SELECT id, user_id, name, price, quantity, updated_at, created_at FROM products WHERE id = ?`
+	var product tuku.Product
+	err := pr.db.Get(&product, query, id)
+	if err == sql.ErrNoRows {
+		return nil, errors.New("Product not found")
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &product, nil
+}
+
 func (pr *mysqlProductRepo) Create(p *tuku.Product) error {
 	query := `INSERT products SET user_id=?, name=?, price=?, quantity=?, updated_at=? , created_at=?`
 	stmt, err := pr.db.Prepare(query)

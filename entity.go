@@ -13,7 +13,7 @@ type User struct {
 type Deposit struct {
 	ID        int64     `db:"id" json:"id"`
 	UserID    int64     `db:"user_id" json:"user_id"`
-	Price     int64     `db:"price" json:"price"`
+	Balance   int64     `db:"balance" json:"balance"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }

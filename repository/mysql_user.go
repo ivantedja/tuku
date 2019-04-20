@@ -18,10 +18,10 @@ func NewMysqlUserRepo(db *sql.DB) tuku.UserRepo {
 	return &mysqlUserRepo{sqlxdb}
 }
 
-func (u *mysqlUserRepo) Get(id int64) (*tuku.User, error) {
+func (ur *mysqlUserRepo) Get(id int64) (*tuku.User, error) {
 	query := `SELECT id, name, admin, updated_at, created_at FROM users WHERE id = ?`
 	var user tuku.User
-	err := u.db.Get(&user, query, id)
+	err := ur.db.Get(&user, query, id)
 	if err == sql.ErrNoRows {
 		return nil, errors.New("User not found")
 	}
@@ -33,9 +33,9 @@ func (u *mysqlUserRepo) Get(id int64) (*tuku.User, error) {
 	return &user, nil
 }
 
-func (u *mysqlUserRepo) Create(user *tuku.User) error {
+func (ur *mysqlUserRepo) Create(user *tuku.User) error {
 	query := `INSERT users SET name=? , admin=?, updated_at=? , created_at=?`
-	stmt, err := u.db.Prepare(query)
+	stmt, err := ur.db.Prepare(query)
 	if err != nil {
 		return err
 	}
