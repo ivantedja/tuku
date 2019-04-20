@@ -12,6 +12,7 @@ type ProductRepo interface {
 }
 
 type DepositRepo interface {
+	Get(ID int64) (*Deposit, error)
 	GetBalanceByUserID(userID int64) (*Deposit, error)
 	UpdateDeposit(ID int64, deposit *Deposit) error
 }

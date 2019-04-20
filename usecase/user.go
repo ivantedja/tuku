@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/ivantedja/tuku"
@@ -30,14 +29,30 @@ func (u *userUsecase) CreateUser(user *tuku.User) error {
 	return u.UserRepo.Create(user)
 }
 
-func (uu *userUsecase) Pay(userID int64, productID int64) error {
-	balance, _ := uu.DepositUsecase.GetBalanceByUserID(userID)
-	fmt.Printf("pay balance: %+v\n", balance)
+func (uu *userUsecase) Pay(userID int64, productID int64, quantity int64) error {
+	deposit, err := uu.DepositUsecase.GetBalanceByUserID(userID)
+	if err != nil {
+		return err
+	}
 
-	product, count, _ := uu.ProductRepo.GetProductsByUserID(10, 0, userID)
-	fmt.Printf("pay count: %d, product: %+v\n", count, product)
+	product, err := uu.ProductRepo.Get(productID)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	if product.Quantity < quantity {
+		return errors.New("Quantity not enough")
+	}
+
+	//allow negative value
+	//if deposit.Balance < quantity * product.Price {
+	//	return errors.New("Balance not enough")
+	//}
+
+	newAmount := deposit.Balance - (product.Price * quantity)
+
+	err = uu.DepositUsecase.ReduceBalance(deposit.ID, newAmount)
+	return err
 }
 
 func (uu *userUsecase) CreateProduct(userID int64, p *tuku.Product) error {
