@@ -11,6 +11,7 @@ type UserUsecase interface {
 }
 
 type DepositUsecase interface {
+	Get(ID int64) (*Deposit, error)
 	GetBalanceByUserID(userID int64) (*Deposit, error)
-	ReduceBalance(userID int64, amount int64) error
+	ReduceBalance(ID int64, amount int64) error
 }

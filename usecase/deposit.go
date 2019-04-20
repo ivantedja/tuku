@@ -26,6 +26,8 @@ func (du *depositUsecase) ReduceBalance(ID int64, amount int64) error {
 		return err
 	}
 
-	err = du.DepositRepo.UpdateDeposit(deposit.ID, deposit)
+	deposit.Balance = amount
+
+	err = du.DepositRepo.UpdateDeposit(ID, deposit)
 	return err
 }
